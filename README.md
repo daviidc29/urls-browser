@@ -47,8 +47,8 @@ Ejecutar con JAR (si no definiste Main-Class, usa -cp + FQN):
 
 java -cp target/repo-urls-browser-1.0.0.jar edu.eci.arsw.browser.MiniBrowser --url=https://example.org
 
-### Descripción detallada de las clases
-1) edu.eci.arsw.urlinspector.URLInspector (Ejercicio 1)
+## Descripción detallada de las clases
+### 1) edu.eci.arsw.urlinspector.URLInspector (Ejercicio 1)
 
 Propósito: dada una URL (por argumento o usando un valor por defecto), crea un java.net.URL e imprime ocho componentes en este orden exacto:
 
@@ -78,7 +78,7 @@ Salida: ocho líneas, una por cada componente (en el orden anterior).
 
 Errores: si la URL no es válida (MalformedURLException), imprime un mensaje claro en stderr.
 
-2) edu.eci.arsw.browser.MiniBrowser (Ejercicio 2)
+### 2) edu.eci.arsw.browser.MiniBrowser (Ejercicio 2)
 
 Propósito: actuar como un mini-navegador muy simple:
 
