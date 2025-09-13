@@ -3,37 +3,62 @@
 ## David Santiago Castro Sierra
 
 ## Ejercicio 1 – URLInspector: funcionalidad y solución
+
 ### Funcionalidad
+
 – Recibir una dirección URL como entrada y descomponerla en sus partes principales para mostrarlas cada una en una línea.
+
 – Las partes impresas, en orden, son: protocolo, autoridad, host, puerto, ruta (path), consulta (query), archivo (file = path + ?query), y referencia (ref o fragmento).
+
 – Si el usuario no proporciona la URL, la aplicación usa una dirección por defecto válida para garantizar una salida demostrativa.
+
 – La salida es puramente textual y determinista para que pueda validarse fácil y automáticamente.
 
 ### Solución técnica
+
 – Interpretación del argumento de línea de comandos aceptando tanto un primer argumento simple como el formato clave–valor “--url=…”, tomando el primero válido que aparezca.
+
 – Construcción de un objeto java.net.URL con la cadena entregada por el usuario, aprovechando su API para extraer los componentes estandarizados.
+
 – Impresión de los ocho componentes en líneas separadas y en el orden requerido para facilitar el cotejo con el enunciado.
+
 – Manejo explícito de errores de formato mediante captura de MalformedURLException, con un mensaje claro para el usuario sin producir trazas innecesarias.
+
 – Consideraciones de valores especiales de la API de URL, como puerto -1 cuando no existe puerto explícito en la cadena, query y ref con valor nulo cuando no están presentes, y file definido como path más la query si existe.
+
 – Diseño sin estado compartido y sin dependencias externas, lo que elimina condiciones de carrera y facilita pruebas deterministas.
+
 – Elección de una implementación minimalista centrada en la clase URL para enfocarse en el objetivo del ejercicio: comprensión de los componentes de una URL y su extracción correcta.
 
 ## Ejercicio 2 – MiniBrowser: funcionalidad y solución
 
 ### Funcionalidad
+
 – Solicitar una dirección URL al usuario, ya sea como argumento o, si falta, interactuando por consola para capturarla.
+
 – Leer el contenido disponible en esa dirección como flujo de texto y almacenarlo de manera íntegra en un archivo llamado “resultado.html” o en la ruta indicada por el usuario.
+
 – Informar al usuario, tras la descarga, el tamaño aproximado de lo leído y la ubicación absoluta del archivo generado, de modo que pueda abrirlo en su navegador.
+
 – Comportarse de forma robusta ante fallos de red o rutas inválidas, mostrando mensajes comprensibles sin finalizar abruptamente.
 
+
 ### Solución técnica
+
 – Obtención de la URL por argumento con soporte a “--url=…” o primer argumento simple, y recogida alternativa desde stdin si no se entregó argumento; la ruta de salida admite también forma “--out=…”.
+
 – Uso de java.net.URL junto con openStream para crear un InputStream de solo lectura que no requiere manejo manual de cabeceras ni negociación de protocolo, alineado con el patrón didáctico del ejemplo URLReader.
+
 – Lectura línea a línea mediante BufferedReader sobre el flujo de entrada y escritura inmediata en un BufferedWriter de salida codificado en UTF-8 para preservar caracteres acentuados y minimizar problemas de portabilidad.
+
 – Cálculo de un conteo aproximado de bytes basado en la longitud de cada línea en UTF-8 más el salto de línea, suficiente para retroalimentar al usuario sin sobrecargar el ejercicio con detalles de binarios.
+
 – Gestión de recursos con try-with-resources para garantizar el cierre de flujos incluso ante excepciones, evitando archivos corruptos o descriptores abiertos.
+
 – Manejo de excepciones de E/S con mensajes claros que distinguen problemas de red, permisos de escritura o rutas inválidas, manteniendo a la vez el proceso principal libre de trazas ruidosas.
+
 – Decisión consciente de no exponer cabeceras HTTP (como Content-Type) al utilizar openStream: se prioriza reproducir el patrón básico del ejercicio; si en una evolución se requiriera inspección de cabeceras o redirecciones explícitas, se reemplazaría por HttpURLConnection conservando el resto del flujo.
+
 – Diseño sin dependencias externas y sin estado global, de modo que el comportamiento sea consistente en distintos entornos y fácil de validar con servidores de prueba embebidos o locales.
 
 ### Cómo compilar y ejecutar
