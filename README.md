@@ -2,15 +2,41 @@
 
 ## David Santiago Castro Sierra
 
-### Utilidades de red para practicar:
+## Ejercicio 1 – URLInspector: funcionalidad y solución
+### Funcionalidad
+– Recibir una dirección URL como entrada y descomponerla en sus partes principales para mostrarlas cada una en una línea.
+– Las partes impresas, en orden, son: protocolo, autoridad, host, puerto, ruta (path), consulta (query), archivo (file = path + ?query), y referencia (ref o fragmento).
+– Si el usuario no proporciona la URL, la aplicación usa una dirección por defecto válida para garantizar una salida demostrativa.
+– La salida es puramente textual y determinista para que pueda validarse fácil y automáticamente.
 
-Ejercicio 1 – URLInspector: crea un objeto URL y desglosa sus componentes (protocol, authority, host, port, path, query, file, ref) imprimiéndolos en líneas separadas y en ese orden.
+### Solución técnica
+– Interpretación del argumento de línea de comandos aceptando tanto un primer argumento simple como el formato clave–valor “--url=…”, tomando el primero válido que aparezca.
+– Construcción de un objeto java.net.URL con la cadena entregada por el usuario, aprovechando su API para extraer los componentes estandarizados.
+– Impresión de los ocho componentes en líneas separadas y en el orden requerido para facilitar el cotejo con el enunciado.
+– Manejo explícito de errores de formato mediante captura de MalformedURLException, con un mensaje claro para el usuario sin producir trazas innecesarias.
+– Consideraciones de valores especiales de la API de URL, como puerto -1 cuando no existe puerto explícito en la cadena, query y ref con valor nulo cuando no están presentes, y file definido como path más la query si existe.
+– Diseño sin estado compartido y sin dependencias externas, lo que elimina condiciones de carrera y facilita pruebas deterministas.
+– Elección de una implementación minimalista centrada en la clase URL para enfocarse en el objetivo del ejercicio: comprensión de los componentes de una URL y su extracción correcta.
 
-Ejercicio 2 – MiniBrowser: pide una URL (por argumento o por consola), la lee con openStream() y guarda el resultado en resultado.html (o la ruta que indiques con --out=). Luego puedes abrir ese archivo en tu navegador favorito.
+## Ejercicio 2 – MiniBrowser: funcionalidad y solución
 
-Ambos están escritos en Java 21, con Maven ≥ 3.9, y cuentan con pruebas JUnit 5 que no dependen de Internet (levantan un pequeño HTTP server embebido).
+### Funcionalidad
+– Solicitar una dirección URL al usuario, ya sea como argumento o, si falta, interactuando por consola para capturarla.
+– Leer el contenido disponible en esa dirección como flujo de texto y almacenarlo de manera íntegra en un archivo llamado “resultado.html” o en la ruta indicada por el usuario.
+– Informar al usuario, tras la descarga, el tamaño aproximado de lo leído y la ubicación absoluta del archivo generado, de modo que pueda abrirlo en su navegador.
+– Comportarse de forma robusta ante fallos de red o rutas inválidas, mostrando mensajes comprensibles sin finalizar abruptamente.
 
-Cómo compilar y ejecutar
+### Solución técnica
+– Obtención de la URL por argumento con soporte a “--url=…” o primer argumento simple, y recogida alternativa desde stdin si no se entregó argumento; la ruta de salida admite también forma “--out=…”.
+– Uso de java.net.URL junto con openStream para crear un InputStream de solo lectura que no requiere manejo manual de cabeceras ni negociación de protocolo, alineado con el patrón didáctico del ejemplo URLReader.
+– Lectura línea a línea mediante BufferedReader sobre el flujo de entrada y escritura inmediata en un BufferedWriter de salida codificado en UTF-8 para preservar caracteres acentuados y minimizar problemas de portabilidad.
+– Cálculo de un conteo aproximado de bytes basado en la longitud de cada línea en UTF-8 más el salto de línea, suficiente para retroalimentar al usuario sin sobrecargar el ejercicio con detalles de binarios.
+– Gestión de recursos con try-with-resources para garantizar el cierre de flujos incluso ante excepciones, evitando archivos corruptos o descriptores abiertos.
+– Manejo de excepciones de E/S con mensajes claros que distinguen problemas de red, permisos de escritura o rutas inválidas, manteniendo a la vez el proceso principal libre de trazas ruidosas.
+– Decisión consciente de no exponer cabeceras HTTP (como Content-Type) al utilizar openStream: se prioriza reproducir el patrón básico del ejercicio; si en una evolución se requiriera inspección de cabeceras o redirecciones explícitas, se reemplazaría por HttpURLConnection conservando el resto del flujo.
+– Diseño sin dependencias externas y sin estado global, de modo que el comportamiento sea consistente en distintos entornos y fácil de validar con servidores de prueba embebidos o locales.
+
+### Cómo compilar y ejecutar
 1) Compilar (genera target/classes y el JAR)
 
 Desde la carpeta del proyecto:
@@ -21,7 +47,7 @@ mvn -q -DskipTests=false test package
 
 - Si solo quieres compilar sin pruebas:
 
-mvn -q -DskipTests package
+ - mvn -q -DskipTests package
 
 2) Ejecutar desde VS Code – Terminal integrada
 
@@ -29,23 +55,23 @@ mvn -q -DskipTests package
 
 - Asegúrate de estar en la carpeta del proyecto:
 
-cd repo-urls-browser
+ - cd repo-urls-browser
 
 Ejecutar sin usar el JAR (directo desde target/classes):
 
 Linux/macOS:
 
-java -cp target/classes edu.eci.arsw.urlinspector.URLInspector --url=http://example.com:8080/foo?x=1#ref
-java -cp target/classes edu.eci.arsw.browser.MiniBrowser --url=https://example.org --out=resultado.html
+- java -cp target/classes edu.eci.arsw.urlinspector.URLInspector --url=http://example.com:8080/foo?x=1#ref
+- java -cp target/classes edu.eci.arsw.browser.MiniBrowser --url=https://example.org --out=resultado.html
 
 Windows (PowerShell)
 
-java -cp target\classes edu.eci.arsw.urlinspector.URLInspector --url=http://example.com:8080/foo?x=1#ref
-java -cp target\classes edu.eci.arsw.browser.MiniBrowser --url=https://example.org --out=resultado.html
+- java -cp target\classes edu.eci.arsw.urlinspector.URLInspector --url=http://example.com:8080/foo?x=1#ref
+- java -cp target\classes edu.eci.arsw.browser.MiniBrowser --url=https://example.org --out=resultado.html
 
 Ejecutar con JAR (si no definiste Main-Class, usa -cp + FQN):
 
-java -cp target/repo-urls-browser-1.0.0.jar edu.eci.arsw.browser.MiniBrowser --url=https://example.org
+- java -cp target/repo-urls-browser-1.0.0.jar edu.eci.arsw.browser.MiniBrowser --url=https://example.org
 
 ## Descripción detallada de las clases
 ### 1) edu.eci.arsw.urlinspector.URLInspector (Ejercicio 1)
@@ -163,7 +189,7 @@ Las pruebas no dependen de Internet:
 
 Ejecutar todas las pruebas:
 
-mvn -q -DskipTests=false test
+- mvn -q -DskipTests=false test
 
 Notas de diseño y decisiones técnicas
 
